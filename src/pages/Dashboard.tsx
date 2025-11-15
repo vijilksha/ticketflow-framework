@@ -52,7 +52,7 @@ const Dashboard = () => {
       if (error) throw error;
       setProfile(data);
     } catch (error: any) {
-      console.error('Error fetching profile:', error);
+      // Error handled silently
     }
   };
 
