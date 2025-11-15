@@ -42,10 +42,22 @@ tests/
 │   ├── auth-data-driven.spec.ts   # Auth tests using CSV/JSON data
 │   ├── events-data-driven.spec.ts # Events tests using JSON data
 │   └── user-profiles-data-driven.spec.ts # User profile tests
+├── integration/                   # Integration test specs
+│   ├── auth-integration.spec.ts   # Authentication workflow integration tests
+│   ├── booking-integration.spec.ts # Booking workflow integration tests
+│   └── dashboard-integration.spec.ts # Dashboard workflow integration tests
+├── performance/                   # Performance test specs
+│   ├── page-load-performance.spec.ts # Page load time tests
+│   ├── api-performance.spec.ts    # API response time tests
+│   └── transaction-performance.spec.ts # Transaction duration tests
+├── regression/                    # Regression test specs
+│   ├── functional-regression.spec.ts # Functional regression tests
+│   └── visual-regression.spec.ts  # Visual regression tests
 ├── fixtures/
 │   ├── page-fixtures.ts           # Page object fixtures for dependency injection
 │   ├── api-fixtures.ts            # API client fixtures
 │   ├── data-fixtures.ts           # Data reader fixtures
+│   ├── performance-fixtures.ts    # Performance metrics fixtures
 │   └── test-data.ts               # Test data generators
 ├── pages/
 │   ├── base.page.ts               # Base page with common functionality
@@ -59,7 +71,9 @@ tests/
 │   ├── bookings.api.spec.ts       # Bookings API tests
 │   └── data-driven-api.spec.ts    # Data-driven API tests
 ├── utils/
-│   └── data-reader.ts             # CSV and JSON data reader utility
+│   ├── data-reader.ts             # CSV and JSON data reader utility
+│   ├── performance-metrics.ts     # Performance measurement utilities
+│   └── visual-regression.ts       # Visual comparison utilities
 ├── helpers/
 │   └── auth-helper.ts             # Authentication helper functions
 ├── auth.spec.ts                   # Authentication UI tests
@@ -92,11 +106,34 @@ tests/
 - Easy to add new test cases without code changes
 - Supports parameterized testing
 
-### 5. Reusable Components
+### 5. Integration Testing
+- Combines UI interactions with API calls
+- Tests complete end-to-end user workflows
+- Validates data consistency across layers
+- Real-world user journey simulation
+- Cross-layer verification (UI ↔ API ↔ Database)
+
+### 6. Performance Testing
+- Page load time measurements
+- API response time benchmarking
+- Transaction duration tracking
+- Performance threshold validation
+- Detailed performance reports
+
+### 7. Regression Testing
+- Functional regression testing
+- Visual regression testing
+- Critical path validation
+- Screenshot comparison
+- Baseline management
+
+### 8. Reusable Components
 - Test data generators
 - Authentication helpers
 - Common utilities
 - Data reader utilities
+- Performance metrics utilities
+- Visual comparison utilities
 
 ## Running Tests
 
@@ -118,6 +155,11 @@ npx playwright test tests/api/
 ### Run Data-Driven Tests Only
 ```bash
 npx playwright test tests/data-driven/
+```
+
+### Run Integration Tests Only
+```bash
+npx playwright test tests/integration/
 ```
 
 ### Run Performance Tests Only
@@ -191,6 +233,48 @@ test('data-driven test', async ({ dataReader }) => {
   });
 });
 ```
+
+## Test Categories
+
+This testing framework supports multiple test types to ensure comprehensive coverage:
+
+1. **UI Tests** (`tests/*.spec.ts`) - Test user interface interactions using page objects
+2. **API Tests** (`tests/api/`) - Test backend API endpoints directly
+3. **Integration Tests** (`tests/integration/`) - Test complete end-to-end workflows combining UI and API
+4. **Data-Driven Tests** (`tests/data-driven/`) - Test multiple scenarios with different datasets from CSV/JSON
+5. **Performance Tests** (`tests/performance/`) - Measure and validate application performance metrics
+6. **Regression Tests** (`tests/regression/`) - Ensure stability across releases with functional and visual testing
+
+## Architecture Highlights
+
+### SOLID Principles Implementation
+
+1. **Single Responsibility Principle (SRP)**
+   - Each page class handles only one page's interactions
+   - API client handles only API requests
+   - Integration tests orchestrate UI and API interactions
+   - Utilities handle only their specific concerns (data reading, performance metrics, visual comparison)
+
+2. **Open/Closed Principle (OCP)**
+   - Base page class provides core functionality
+   - Page classes extend base without modifying it
+   - Easy to add new pages by extending BasePage
+   - Integration tests can combine page objects in different ways
+
+3. **Liskov Substitution Principle (LSP)**
+   - All page objects can be used through BasePage interface
+   - Fixtures provide consistent interfaces across tests
+   - Integration tests use same page objects as UI tests
+
+4. **Interface Segregation Principle (ISP)**
+   - Separate fixtures for different concerns (pages, API, data, performance)
+   - Tests only depend on fixtures they actually use
+   - Integration tests compose multiple fixtures as needed
+
+5. **Dependency Inversion Principle (DIP)**
+   - Tests depend on fixtures (abstractions), not concrete implementations
+   - Easy to mock or replace implementations
+   - Integration tests use same abstractions as unit tests
 
 ## Writing New Tests
 
@@ -515,6 +599,159 @@ const validUsers = dataReader.filterByColumn(data, 'expectedResult', 'success');
 **Get unique values:**
 ```typescript
 const testCases = dataReader.getUniqueValues(data, 'testCase');
+```
+
+## Integration Testing
+
+### Overview
+Integration tests combine UI interactions (via Page Objects) with API calls to verify complete end-to-end user workflows. These tests ensure data flows correctly between frontend and backend, validating the application works as a cohesive system.
+
+### Running Integration Tests
+
+```bash
+# Run all integration tests
+npx playwright test tests/integration
+
+# Run specific integration suite
+npx playwright test tests/integration/auth-integration.spec.ts
+npx playwright test tests/integration/booking-integration.spec.ts
+npx playwright test tests/integration/dashboard-integration.spec.ts
+
+# Run with UI mode
+npx playwright test tests/integration --ui
+```
+
+### Integration Test Suites
+
+#### 1. Authentication Integration (`auth-integration.spec.ts`)
+Tests complete authentication workflows:
+- Complete signup flow: UI signup → API verification → UI dashboard access
+- Complete signin flow: API user creation → UI login → API session verification  
+- Complete logout flow: UI login → UI logout → API session invalidation
+- Authentication persistence: UI login → Page reload → Session maintained
+
+#### 2. Booking Integration (`booking-integration.spec.ts`)
+Tests complete booking workflows:
+- Complete booking flow: UI login → Browse events → Create booking → API verification
+- Booking data consistency: API booking → UI verification → API data match
+- Event availability update: UI booking → API event verification → Seats decreased
+- Concurrent bookings: Multiple users → Same event → Data consistency
+
+#### 3. Dashboard Integration (`dashboard-integration.spec.ts`)
+Tests complete dashboard workflows:
+- Dashboard data sync: API bookings → UI display → Real-time updates
+- Profile data sync: UI profile update → API verification → Dashboard reflects changes
+- Empty state handling: New user → No bookings → UI shows empty state → API confirms
+- Booking statistics: Multiple bookings → UI aggregates → API validates totals
+- Navigation flow: Dashboard → Events → Booking → Back to Dashboard → Data persists
+
+### Writing Integration Tests
+
+Integration tests use both page fixtures and API client:
+
+```typescript
+import { test, expect } from '../fixtures/page-fixtures';
+import { ApiClient } from '../api/api-client';
+import { generateTestUser } from '../fixtures/test-data';
+
+test('Complete booking flow', async ({ authPage, eventsPage, dashboardPage }) => {
+  // Initialize API client
+  const apiClient = new ApiClient();
+  await apiClient.init();
+  
+  const testUser = generateTestUser();
+  
+  // Step 1: UI - Create account and login
+  await authPage.navigate();
+  await authPage.fillSignupForm(testUser.email, testUser.password, testUser.fullName);
+  await authPage.submitSignup();
+  
+  // Step 2: UI - Navigate to events
+  await eventsPage.navigate();
+  await expect(eventsPage.page).toHaveURL(/.*events/);
+  
+  // Step 3: API - Get event data
+  const { data: events } = await apiClient.getEvents();
+  const selectedEvent = events[0];
+  
+  // Step 4: Get user session for API calls
+  const sessionData = await authPage.page.evaluate(() => {
+    const session = localStorage.getItem('supabase.auth.token');
+    return session ? JSON.parse(session) : null;
+  });
+  
+  if (sessionData?.currentSession?.access_token) {
+    apiClient.setAuthToken(sessionData.currentSession.access_token);
+    const userId = sessionData.currentSession.user.id;
+    
+    // Step 5: API - Create booking
+    const { data } = await apiClient.createBooking(
+      selectedEvent.id,
+      2,
+      selectedEvent.price * 2,
+      userId
+    );
+    
+    expect(data[0].event_id).toBe(selectedEvent.id);
+    
+    // Step 6: UI - Verify booking appears in dashboard
+    await dashboardPage.navigate();
+    await expect(dashboardPage.page.getByText(selectedEvent.title, { exact: false })).toBeVisible();
+  }
+  
+  // Cleanup
+  await apiClient.dispose();
+});
+```
+
+### Integration Testing Best Practices
+
+1. **Test Complete User Journeys**: Focus on end-to-end flows users actually perform
+2. **Verify Data at Multiple Levels**: Check consistency across UI, API, and database
+3. **Use Both UI and API Actions**: Combine UI for interactions, API for fast setup
+4. **Handle Session Management**: Properly manage authentication between UI and API
+5. **Clean Up Resources**: Always dispose of API clients and clean up test data
+
+### Data Flow Verification
+
+Each integration test should verify:
+- **UI State**: What users see in the browser
+- **API Responses**: What the backend returns
+- **Database State**: What's actually stored
+
+### Common Integration Patterns
+
+**Pattern 1: API Setup, UI Verification**
+```typescript
+// Fast data setup via API
+const { data } = await apiClient.createBooking(...);
+
+// Verify user can see it in UI
+await dashboardPage.navigate();
+await expect(page.getByText(data.event.title)).toBeVisible();
+```
+
+**Pattern 2: UI Action, API Verification**
+```typescript
+// User performs action in UI
+await eventsPage.bookEvent();
+
+// Verify backend state changed correctly
+const { data } = await apiClient.getEvents();
+expect(data[0].available_seats).toBe(initialSeats - 1);
+```
+
+**Pattern 3: Round-Trip Verification**
+```typescript
+// Create via UI
+await authPage.fillSignupForm(...);
+await authPage.submitSignup();
+
+// Verify via API
+const { data } = await apiClient.getProfile(userId);
+
+// Verify shows in UI
+await expect(dashboardPage.page.getByText(data.full_name)).toBeVisible();
 ```
 
 ## Best Practices
