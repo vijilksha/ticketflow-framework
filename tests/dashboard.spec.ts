@@ -1,21 +1,11 @@
-import { test, expect } from '@playwright/test';
-import { AuthPage } from './pages/auth.page';
-import { DashboardPage } from './pages/dashboard.page';
-import { EventsPage } from './pages/events.page';
+import { test, expect } from './fixtures/page-fixtures';
 
 test.describe('User Dashboard', () => {
-  let authPage: AuthPage;
-  let dashboardPage: DashboardPage;
-  let eventsPage: EventsPage;
   const timestamp = Date.now();
   const testEmail = `dashboard${timestamp}@example.com`;
   const testPassword = 'Test123456!';
 
-  test.beforeEach(async ({ page }) => {
-    authPage = new AuthPage(page);
-    dashboardPage = new DashboardPage(page);
-    eventsPage = new EventsPage(page);
-
+  test.beforeEach(async ({ page, authPage }) => {
     // Create and login user
     await authPage.goto();
     await authPage.switchToSignUp();
@@ -25,7 +15,7 @@ test.describe('User Dashboard', () => {
     await page.waitForURL('**/events', { timeout: 10000 });
   });
 
-  test('should display dashboard with user information', async ({ page }) => {
+  test('should display dashboard with user information', async ({ dashboardPage }) => {
     await dashboardPage.goto();
     await dashboardPage.expectPageLoaded();
     
@@ -33,7 +23,7 @@ test.describe('User Dashboard', () => {
     expect(title).toContain('My Dashboard');
   });
 
-  test('should show empty bookings state initially', async () => {
+  test('should show empty bookings state initially', async ({ dashboardPage }) => {
     await dashboardPage.goto();
     await dashboardPage.expectPageLoaded();
     
@@ -41,7 +31,7 @@ test.describe('User Dashboard', () => {
     expect(totalBookings).toBe('0');
   });
 
-  test('should display booking after making one', async ({ page }) => {
+  test('should display booking after making one', async ({ page, eventsPage, dashboardPage }) => {
     // First book an event
     await eventsPage.goto();
     await eventsPage.expectPageLoaded();
@@ -62,7 +52,7 @@ test.describe('User Dashboard', () => {
     await dashboardPage.expectBookingCardVisible();
   });
 
-  test('should navigate back to events from dashboard', async ({ page }) => {
+  test('should navigate back to events from dashboard', async ({ page, dashboardPage }) => {
     await dashboardPage.goto();
     await dashboardPage.clickBackToEvents();
     
@@ -70,12 +60,11 @@ test.describe('User Dashboard', () => {
     await expect(page.locator('[data-testid="events-grid"]')).toBeVisible();
   });
 
-  test('should show correct booking statistics', async ({ page }) => {
-    // Book multiple events
+  test('should show correct booking statistics', async ({ page, eventsPage, dashboardPage }) => {
+    // Book an event
     await eventsPage.goto();
     await eventsPage.expectPageLoaded();
     
-    // Book first event
     await eventsPage.bookFirstEvent();
     await page.waitForTimeout(2000);
     
@@ -87,7 +76,7 @@ test.describe('User Dashboard', () => {
     expect(parseInt(totalBookings)).toBe(1);
   });
 
-  test('should display booking details correctly', async ({ page }) => {
+  test('should display booking details correctly', async ({ page, eventsPage, dashboardPage }) => {
     // Book an event first
     await eventsPage.goto();
     await eventsPage.expectPageLoaded();
