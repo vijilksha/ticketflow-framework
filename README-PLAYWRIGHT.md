@@ -120,6 +120,16 @@ npx playwright test tests/api/
 npx playwright test tests/data-driven/
 ```
 
+### Run Performance Tests Only
+```bash
+npx playwright test tests/performance/
+```
+
+### Run Regression Tests Only
+```bash
+npx playwright test tests/regression/
+```
+
 ### Run Specific Test File
 ```bash
 npx playwright test tests/auth.spec.ts
@@ -237,6 +247,185 @@ test('api test', async ({ apiClient }) => {
 });
 ```
 
+## Performance Testing
+
+### Overview
+Performance testing measures page load times, API response times, and transaction durations to ensure optimal application performance.
+
+### Performance Metrics Collected
+- **Page Load Time**: Time from navigation start to page load complete
+- **Time to Interactive (TTI)**: Time until page is fully interactive
+- **API Response Time**: Time for API calls to complete
+- **Transaction Duration**: Time for complete user flows
+
+### Performance Thresholds
+
+**Page Load Times:**
+- Excellent: < 1000ms
+- Good: < 2500ms
+- Acceptable: < 4000ms
+
+**API Response Times:**
+- Excellent: < 200ms
+- Good: < 500ms
+- Acceptable: < 1000ms
+
+**Transaction Times:**
+- Excellent: < 2000ms
+- Good: < 5000ms
+- Acceptable: < 10000ms
+
+### Running Performance Tests
+
+```bash
+# Run all performance tests
+npx playwright test tests/performance/
+
+# Run specific performance test
+npx playwright test tests/performance/page-load-performance.spec.ts
+npx playwright test tests/performance/api-performance.spec.ts
+npx playwright test tests/performance/transaction-performance.spec.ts
+```
+
+### Performance Test Types
+
+#### 1. Page Load Performance
+Tests page load times for all major pages:
+```typescript
+test('Events page should load within acceptable time', async ({ page, performanceMetrics }) => {
+  const loadTime = await performanceMetrics.measurePageLoad(page, '/events');
+  expect(loadTime).toBeLessThan(4000);
+});
+```
+
+#### 2. API Performance
+Measures API response times:
+```typescript
+test('Events list API response time', async ({ apiClient, performanceMetrics }) => {
+  const responseTime = await performanceMetrics.measureApiResponse(async () => {
+    await apiClient.getEvents();
+  });
+  expect(responseTime).toBeLessThan(1000);
+});
+```
+
+#### 3. Transaction Performance
+Measures complete user workflows:
+```typescript
+test('Complete signup flow', async ({ authPage, performanceMetrics }) => {
+  const { duration } = await performanceMetrics.measureTransaction(
+    'signup_transaction',
+    async () => {
+      // Complete signup flow
+    }
+  );
+  expect(duration).toBeLessThan(10000);
+});
+```
+
+### Performance Reports
+After each test run, detailed performance reports are generated showing:
+- Count of measurements
+- Min, Max, Average times
+- 50th, 90th, 95th, 99th percentiles
+
+## Visual Regression Testing
+
+### Overview
+Visual regression testing detects unintended visual changes by comparing screenshots across test runs.
+
+### Features
+- Full page screenshots
+- Element-specific screenshots
+- Responsive design testing (multiple viewports)
+- Masked elements for dynamic content
+- Dark mode testing
+
+### Running Visual Regression Tests
+
+```bash
+# Run all visual regression tests
+npx playwright test tests/regression/visual-regression.spec.ts
+
+# Update baseline screenshots
+npx playwright test tests/regression/visual-regression.spec.ts --update-snapshots
+```
+
+### Visual Test Examples
+
+#### Full Page Comparison
+```typescript
+test('Landing page visual regression', async ({ page, visualRegression }) => {
+  await page.goto('/');
+  await visualRegression.compareFullPage(page, 'landing-page');
+});
+```
+
+#### Element Comparison
+```typescript
+test('Event card component', async ({ page, visualRegression }) => {
+  await visualRegression.compareElement(
+    page,
+    '[data-testid="event-card"]',
+    'event-card'
+  );
+});
+```
+
+#### Responsive Testing
+```typescript
+test('Multiple viewports', async ({ page, visualRegression }) => {
+  await visualRegression.compareResponsive(page, 'landing-responsive', [
+    CommonViewports.MOBILE,
+    CommonViewports.TABLET,
+    CommonViewports.DESKTOP,
+  ]);
+});
+```
+
+#### Masked Elements
+```typescript
+test('Mask dynamic content', async ({ page, visualRegression }) => {
+  await visualRegression.compareWithMask(
+    page,
+    'events-masked',
+    ['[data-testid="event-date"]', 'time'] // Mask dynamic dates/times
+  );
+});
+```
+
+### Screenshot Comparison Settings
+- **maxDiffPixels**: Maximum allowed pixel differences (default: 100)
+- **threshold**: Pixel color difference threshold 0-1 (default: 0.2)
+- **animations**: Disable animations for consistent screenshots
+
+## Functional Regression Testing
+
+### Overview
+Functional regression tests ensure existing functionality continues to work after code changes.
+
+### Test Coverage
+- Authentication flows
+- Event booking flows
+- Dashboard functionality
+- Navigation between pages
+- Form validation
+- Error handling
+- Protected routes
+- Data persistence
+
+### Running Functional Regression Tests
+
+```bash
+npx playwright test tests/regression/functional-regression.spec.ts
+```
+
+### Regression Test Strategy
+1. **Critical Path Testing**: Test main user journeys
+2. **Integration Testing**: Test feature interactions
+3. **Edge Case Testing**: Test boundary conditions
+4. **Error Scenario Testing**: Test error handling
+
 ## Data-Driven Testing
 
 ### Overview
@@ -342,6 +531,14 @@ const testCases = dataReader.getUniqueValues(data, 'testCase');
 10. **Centralize Test Data**: Keep all test data in `tests/data/` directory
 11. **Document Data Files**: Include descriptions in data files
 12. **Version Control Data**: Track data file changes in git
+13. **Monitor Performance**: Run performance tests regularly
+14. **Set Realistic Thresholds**: Adjust performance thresholds based on infrastructure
+15. **Update Baseline Screenshots**: Update visual baselines when designs change intentionally
+16. **Mask Dynamic Content**: Mask dates, times, and dynamic IDs in visual tests
+17. **Test Multiple Viewports**: Ensure responsive design works across devices
+18. **Run Regression Tests**: Run before major releases
+19. **Track Performance Trends**: Monitor performance metrics over time
+20. **Investigate Failures**: Analyze performance degradation and visual changes
 
 ## Test Data Management
 
