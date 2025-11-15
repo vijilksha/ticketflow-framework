@@ -1,0 +1,62 @@
+{
+  "eventFilters": [
+    {
+      "testCase": "filter_by_category_music",
+      "category": "Music",
+      "expectedMinCount": 1,
+      "description": "Filter events by Music category"
+    },
+    {
+      "testCase": "filter_by_category_sports",
+      "category": "Sports",
+      "expectedMinCount": 1,
+      "description": "Filter events by Sports category"
+    },
+    {
+      "testCase": "filter_by_price_range",
+      "minPrice": 0,
+      "maxPrice": 100,
+      "expectedMinCount": 1,
+      "description": "Filter events by price range"
+    }
+  ],
+  "bookingScenarios": [
+    {
+      "testCase": "book_single_ticket",
+      "eventIndex": 0,
+      "quantity": 1,
+      "expectedStatus": "confirmed",
+      "description": "Book a single ticket for first event"
+    },
+    {
+      "testCase": "book_multiple_tickets",
+      "eventIndex": 0,
+      "quantity": 3,
+      "expectedStatus": "confirmed",
+      "description": "Book multiple tickets for same event"
+    },
+    {
+      "testCase": "book_different_events",
+      "events": [0, 1, 2],
+      "quantity": 1,
+      "expectedStatus": "confirmed",
+      "description": "Book tickets for different events"
+    }
+  ],
+  "invalidBookingScenarios": [
+    {
+      "testCase": "book_zero_tickets",
+      "eventIndex": 0,
+      "quantity": 0,
+      "expectedError": "Quantity must be at least 1",
+      "description": "Attempt to book zero tickets"
+    },
+    {
+      "testCase": "book_excessive_tickets",
+      "eventIndex": 0,
+      "quantity": 1000,
+      "expectedError": "Not enough seats available",
+      "description": "Attempt to book more tickets than available"
+    }
+  ]
+}

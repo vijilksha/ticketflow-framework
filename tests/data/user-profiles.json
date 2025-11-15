@@ -1,0 +1,46 @@
+{
+  "testUsers": [
+    {
+      "role": "regular_user",
+      "email": "user1@example.com",
+      "password": "User123456!",
+      "fullName": "John Doe",
+      "expectedPermissions": ["view_events", "create_booking"],
+      "description": "Regular user with basic permissions"
+    },
+    {
+      "role": "power_user",
+      "email": "poweruser@example.com",
+      "password": "Power123456!",
+      "fullName": "Jane Smith",
+      "expectedPermissions": ["view_events", "create_booking", "cancel_booking"],
+      "description": "Power user with additional permissions"
+    },
+    {
+      "role": "guest",
+      "email": "guest@example.com",
+      "password": "Guest123456!",
+      "fullName": "Guest User",
+      "expectedPermissions": ["view_events"],
+      "description": "Guest user with read-only access"
+    }
+  ],
+  "invalidUsers": [
+    {
+      "testCase": "sql_injection_attempt",
+      "email": "admin'--",
+      "password": "password",
+      "fullName": "Hacker",
+      "expectedResult": "error",
+      "description": "SQL injection attempt in email field"
+    },
+    {
+      "testCase": "xss_attempt",
+      "email": "test@example.com",
+      "password": "Pass123!",
+      "fullName": "<script>alert('xss')</script>",
+      "expectedResult": "error",
+      "description": "XSS attempt in full name field"
+    }
+  ]
+}
