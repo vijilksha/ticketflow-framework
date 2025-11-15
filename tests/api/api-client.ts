@@ -10,7 +10,7 @@ export class ApiClient {
   private readonly supabaseKey: string;
   private authToken: string | null = null;
 
-  constructor(baseURL: string = 'http://localhost:54321', supabaseKey: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVka2dyanpvZ29tbnZtYml4ZXJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMzY0OTEsImV4cCI6MjA3ODcxMjQ5MX0.lZZKbvViUfV8KgVcwCmpQx_wRHkf3vsgvIidumzoLck') {
+  constructor(baseURL: string = 'https://udkgrjzogomnvmbixeri.supabase.co', supabaseKey: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVka2dyanpvZ29tbnZtYml4ZXJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMzY0OTEsImV4cCI6MjA3ODcxMjQ5MX0.lZZKbvViUfV8KgVcwCmpQx_wRHkf3vsgvIidumzoLck') {
     this.baseURL = baseURL;
     this.supabaseKey = supabaseKey;
   }
