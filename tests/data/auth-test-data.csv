@@ -1,0 +1,11 @@
+testCase,email,password,fullName,expectedResult,description
+valid_signup,test@example.com,Test123456!,Test User,success,Valid user signup with all required fields
+weak_password,test@example.com,test,Test User,error,Signup with weak password should fail
+missing_email,,Test123456!,Test User,error,Signup without email should fail
+invalid_email,invalid-email,Test123456!,Test User,error,Signup with invalid email format
+short_password,test@example.com,Test1!,Test User,error,Password too short
+missing_name,test@example.com,Test123456!,,error,Signup without full name should fail
+valid_signin,signin@example.com,Test123456!,Signin User,success,Valid user signin with correct credentials
+wrong_password,signin@example.com,WrongPassword123!,Signin User,error,Signin with wrong password should fail
+nonexistent_user,nonexistent@example.com,Test123456!,Test User,error,Signin with non-existent user should fail
+empty_credentials,,,,error,Signin with empty credentials should fail
