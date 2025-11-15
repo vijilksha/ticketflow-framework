@@ -1,11 +1,7 @@
-import { test, expect } from '@playwright/test';
-import { AuthPage } from './pages/auth.page';
+import { test, expect } from './fixtures/page-fixtures';
 
 test.describe('Authentication Flow', () => {
-  let authPage: AuthPage;
-
-  test.beforeEach(async ({ page }) => {
-    authPage = new AuthPage(page);
+  test.beforeEach(async ({ authPage }) => {
     await authPage.goto();
   });
 
@@ -72,11 +68,11 @@ test.describe('Authentication Flow', () => {
     await authPage.page.waitForTimeout(2000);
   });
 
-  test('should validate required fields', async () => {
+  test('should validate required fields', async ({ page, authPage }) => {
     await authPage.submitSignIn();
     
     // HTML5 validation should prevent submission
-    const emailInput = authPage.page.locator('[data-testid="signin-email"]');
+    const emailInput = page.locator('[data-testid="signin-email"]');
     await expect(emailInput).toHaveAttribute('required');
   });
 

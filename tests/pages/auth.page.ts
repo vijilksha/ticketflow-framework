@@ -1,19 +1,25 @@
 import { Page, Locator } from '@playwright/test';
+import { BasePage } from './base.page';
 
-export class AuthPage {
-  readonly page: Page;
-  readonly signInTab: Locator;
-  readonly signUpTab: Locator;
-  readonly signInEmailInput: Locator;
-  readonly signInPasswordInput: Locator;
-  readonly signInButton: Locator;
-  readonly signUpNameInput: Locator;
-  readonly signUpEmailInput: Locator;
-  readonly signUpPasswordInput: Locator;
-  readonly signUpButton: Locator;
+/**
+ * AuthPage - Implements Single Responsibility Principle
+ * Handles only authentication-related interactions
+ */
+export class AuthPage extends BasePage {
+  protected readonly pageUrl = '/auth';
+  
+  private readonly signInTab: Locator;
+  private readonly signUpTab: Locator;
+  private readonly signInEmailInput: Locator;
+  private readonly signInPasswordInput: Locator;
+  private readonly signInButton: Locator;
+  private readonly signUpNameInput: Locator;
+  private readonly signUpEmailInput: Locator;
+  private readonly signUpPasswordInput: Locator;
+  private readonly signUpButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.signInTab = page.locator('[data-testid="signin-tab"]');
     this.signUpTab = page.locator('[data-testid="signup-tab"]');
     this.signInEmailInput = page.locator('[data-testid="signin-email"]');
@@ -25,47 +31,47 @@ export class AuthPage {
     this.signUpButton = page.locator('[data-testid="signup-button"]');
   }
 
-  async goto() {
-    await this.page.goto('/auth');
-  }
-
-  async expectPageLoaded() {
+  async expectPageLoaded(): Promise<void> {
     await this.signInTab.waitFor({ state: 'visible' });
     await this.signUpTab.waitFor({ state: 'visible' });
   }
 
-  async switchToSignIn() {
-    await this.signInTab.click();
+  async switchToSignIn(): Promise<void> {
+    await this.clickElement(this.signInTab);
   }
 
-  async switchToSignUp() {
-    await this.signUpTab.click();
+  async switchToSignUp(): Promise<void> {
+    await this.clickElement(this.signUpTab);
   }
 
-  async fillSignInForm(email: string, password: string) {
-    await this.signInEmailInput.fill(email);
-    await this.signInPasswordInput.fill(password);
+  async fillSignInForm(email: string, password: string): Promise<void> {
+    await this.fillInput(this.signInEmailInput, email);
+    await this.fillInput(this.signInPasswordInput, password);
   }
 
-  async fillSignUpForm(email: string, password: string, name: string) {
-    await this.signUpNameInput.fill(name);
-    await this.signUpEmailInput.fill(email);
-    await this.signUpPasswordInput.fill(password);
+  async fillSignUpForm(email: string, password: string, name: string): Promise<void> {
+    await this.fillInput(this.signUpNameInput, name);
+    await this.fillInput(this.signUpEmailInput, email);
+    await this.fillInput(this.signUpPasswordInput, password);
   }
 
-  async submitSignIn() {
-    await this.signInButton.click();
+  async submitSignIn(): Promise<void> {
+    await this.clickElement(this.signInButton);
   }
 
-  async submitSignUp() {
-    await this.signUpButton.click();
+  async submitSignUp(): Promise<void> {
+    await this.clickElement(this.signUpButton);
   }
 
-  async expectSignInTabVisible() {
+  async expectSignInTabVisible(): Promise<void> {
     await this.signInEmailInput.waitFor({ state: 'visible' });
   }
 
-  async expectSignUpTabVisible() {
+  async expectSignUpTabVisible(): Promise<void> {
     await this.signUpNameInput.waitFor({ state: 'visible' });
+  }
+
+  async isSignInTabActive(): Promise<boolean> {
+    return await this.isVisible(this.signInEmailInput);
   }
 }
