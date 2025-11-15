@@ -135,6 +135,54 @@ tests/
 - Performance metrics utilities
 - Visual comparison utilities
 
+## Test Reporting
+
+This project includes comprehensive test reporting with multiple formats:
+
+### Report Types
+
+1. **HTML Report** - Interactive web-based report
+   - Location: `playwright-report/index.html`
+   - View: `npx playwright show-report`
+   - Features: Screenshots, videos, traces, and detailed test results
+
+2. **JSON Report** - Machine-readable format
+   - Location: `test-results/results.json`
+   - Use for CI/CD integrations and custom processing
+
+3. **JUnit Report** - XML format for CI systems
+   - Location: `test-results/junit.xml`
+   - Compatible with Jenkins, GitLab CI, and other CI tools
+
+4. **Custom HTML Summary** - Quick overview dashboard
+   - Location: `test-results/summary.html`
+   - Features: Visual statistics, success rates, and failed test highlights
+
+5. **Custom JSON Report** - Enhanced test analytics
+   - Location: `test-results/custom-report.json`
+   - Includes detailed metrics and test categorization
+
+### Viewing Reports
+
+```bash
+# Open HTML report in browser
+npx playwright show-report
+
+# View custom summary
+open test-results/summary.html
+
+# View JSON data
+cat test-results/custom-report.json | jq
+```
+
+### Report Configuration
+
+Reports are configured in `playwright.config.ts`:
+- Traces captured on failure for debugging
+- Screenshots taken on test failure
+- Videos recorded for failed tests
+- Custom reporter for enhanced console output
+
 ## Running Tests
 
 ### Run All Tests

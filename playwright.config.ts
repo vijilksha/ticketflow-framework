@@ -6,12 +6,30 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: [
+    ['html', { 
+      open: 'never',
+      outputFolder: 'playwright-report',
+      host: 'localhost',
+      port: 9323,
+    }],
+    ['json', { outputFile: 'test-results/results.json' }],
+    ['junit', { outputFile: 'test-results/junit.xml' }],
+    ['list'],
+    ['./tests/utils/custom-reporter.ts'],
+  ],
   use: {
     baseURL: 'http://localhost:8080',
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    actionTimeout: 15000,
+    navigationTimeout: 30000,
+  },
+  
+  timeout: 60000,
+  expect: {
+    timeout: 10000,
   },
 
   projects: [
