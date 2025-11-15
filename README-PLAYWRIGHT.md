@@ -2,6 +2,28 @@
 
 This Playwright testing framework follows SOLID principles for maintainable and scalable test automation with comprehensive data-driven testing capabilities.
 
+## CI/CD Integration
+
+This project includes a complete **Jenkins CI/CD pipeline** configuration for automated testing and deployment.
+
+### Quick Start with Jenkins
+
+1. **Install Required Jenkins Plugins**: Pipeline, NodeJS, HTML Publisher, JUnit, Credentials Binding
+2. **Configure Credentials**: Set up Supabase environment variables as Jenkins credentials
+3. **Create Pipeline Job**: Point to the `Jenkinsfile` in the repository
+4. **Configure Triggers**: Set up webhooks or SCM polling for automatic builds
+
+### Pipeline Features
+
+- ✅ **Parallel Test Execution**: API, Integration, E2E, and Data-Driven tests run simultaneously
+- 📊 **Comprehensive Reporting**: HTML reports, JUnit results, and custom dashboards
+- 🚀 **Automated Deployments**: Branch-specific deployment to staging and production
+- 🔒 **Manual Approval**: Production deployments require manual confirmation
+- 📦 **Artifact Archiving**: Build outputs and test results preserved
+- 🎯 **Branch Strategy**: Different stages for main, develop, and feature branches
+
+For detailed Jenkins setup instructions, see the [Jenkins README](jenkins/README.md).
+
 ## Architecture Overview
 
 ### SOLID Principles Implementation
